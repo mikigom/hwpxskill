@@ -2,11 +2,9 @@
 
 한컴오피스 HWPX 문서를 AI 코딩 에이전트에서 다룰 수 있게 해주는 스킬입니다.
 
-python-hwpx API를 쓰면 버그가 많아서, XML을 직접 건드리는 방식을 택했습니다. 덕분에 기존 문서의 서식이나 구조를 거의 그대로 유지하면서 내용만 갈아끼울 수 있습니다.
-
 ## 뭘 할 수 있나
 
-원본 HWPX 파일을 넣으면 스타일, 표 구조, 셀 병합, 여백까지 분석해서 구조를 보존한 채 내용만 바꿔줍니다. 원본이 없으면 공문, 보고서 같은 내장 템플릿으로 새 문서를 만들 수도 있고요. 다 만들고 나면 `page_guard.py`가 원본 대비 페이지 수가 달라졌는지 자동으로 잡아냅니다.
+원본 HWPX 파일을 넣으면 스타일, 표 구조, 셀 병합, 여백까지 분석해서 구조를 보존한 채 내용만 바꿔줍니다. 원본이 없으면 공문, 보고서 같은 내장 템플릿으로 새 문서를 만들 수도 있고요. 다 만들고 나면 `page_guard.py`가 원본 대비 페이지 수가 달라졌는지 자동으로 잡아냅니다. 결과물은 `hwpx2pdf.py`로 PDF 변환하여 바로 확인할 수 있습니다.
 
 OWPML 표준 XML을 직접 다루기 때문에 charPr, paraPr 단위로 서식을 제어할 수 있습니다. Claude Code, Cursor, Codex CLI에서 모두 동작합니다.
 
@@ -119,6 +117,26 @@ python3 scripts/validate.py result.hwpx
 python3 scripts/page_guard.py --reference reference.hwpx --output result.hwpx
 ```
 
+### 6. PDF 변환
+
+HWPX를 PDF로 변환합니다. 한컴오피스 없이도 standalone 엔진(lxml+fpdf2)으로 동작합니다. 생성/수정한 문서를 바로 시각 확인하거나, PDF 관련 도구에 넘길 때 씁니다.
+
+```bash
+# standalone (기본, 크로스플랫폼)
+python3 scripts/hwpx2pdf.py result.hwpx -o result.pdf
+
+# 엔진 지정
+python3 scripts/hwpx2pdf.py result.hwpx -o result.pdf --engine standalone
+python3 scripts/hwpx2pdf.py result.hwpx -o result.pdf --engine hancom   # 한컴오피스
+python3 scripts/hwpx2pdf.py result.hwpx -o result.pdf --engine word     # MS Word
+```
+
+| 엔진 | 필요 조건 | 특징 |
+|------|-----------|------|
+| standalone | lxml, fpdf2 | 크로스플랫폼, 오피스 불필요 |
+| hancom | Windows + 한컴오피스 | 완벽한 레이아웃 |
+| word | Windows + MS Word | MS Word 레이아웃 |
+
 ## 템플릿
 
 | 템플릿 | 용도 | 특징 |
@@ -131,8 +149,9 @@ python3 scripts/page_guard.py --reference reference.hwpx --output result.hwpx
 
 ## 요구사항
 
-- Python 3.6 이상
+- Python 3.8 이상
 - lxml (`pip install lxml`)
+- fpdf2 (`pip install fpdf2`) — PDF 변환용
 - 가상환경 권장
 
 ## 스크립트
@@ -146,6 +165,7 @@ python3 scripts/page_guard.py --reference reference.hwpx --output result.hwpx
 | `validate.py` | HWPX 구조 검증 |
 | `page_guard.py` | 원본 대비 페이지 수 변동 감지 |
 | `text_extract.py` | 텍스트 추출 |
+| `hwpx2pdf.py` | HWPX → PDF 변환 (standalone/hancom/word) |
 
 ## 자세한 사용법
 

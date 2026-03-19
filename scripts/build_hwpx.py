@@ -3,7 +3,7 @@
 
 Assembles a valid HWPX file by:
 1. Copying the base template
-2. Optionally overlaying a document-type template (gonmun, report, minutes)
+2. Optionally overlaying a document-type template (gonmun, report, minutes, proposal)
 3. Optionally overriding header.xml and/or section0.xml with custom files
 4. Optionally setting metadata (title, creator)
 5. Validating XML well-formedness
@@ -42,7 +42,7 @@ SKILL_DIR = SCRIPT_DIR.parent
 TEMPLATES_DIR = SKILL_DIR / "templates"
 BASE_DIR = TEMPLATES_DIR / "base"
 
-AVAILABLE_TEMPLATES = ["gonmun", "report", "minutes"]
+AVAILABLE_TEMPLATES = ["gonmun", "report", "minutes", "proposal"]
 
 
 def validate_xml(filepath: Path) -> None:
