@@ -24,7 +24,8 @@
 - 사용자가 레퍼런스를 제공한 경우 **결과 문서의 최종 쪽수는 레퍼런스와 동일해야 한다**
 - 쪽수가 늘어날 가능성이 보이면 먼저 텍스트를 압축/요약해서 기존 레이아웃에 맞춘다
 - 사용자 명시 요청 없이 `hp:p`, `hp:tbl`, `rowCnt`, `colCnt`, `pageBreak`, `secPr`를 변경하지 않는다
-- `validate.py` 통과만으로 완료 처리하지 않는다. 반드시 `page_guard.py`도 통과해야 한다
+- `validate.py` 통과만으로 완료 처리하지 않는다. `edit_guard.py`와 `page_guard.py`도 모두 통과해야 한다
+- `edit_guard.py` 실패 시 결과를 완료로 제출하지 않고, 원인(구조 변경/텍스트 손상/IDRef 불일치)을 수정 후 재빌드한다
 - `page_guard.py` 실패 시 결과를 완료로 제출하지 않고, 원인(길이 과다/구조 변경)을 수정 후 재빌드한다
 - 가능하면 한글(또는 사용자의 확인) 기준 최종 쪽수 값을 확인하고 레퍼런스와 일치 여부를 재확인한다
 
@@ -47,10 +48,15 @@ python3 "$SKILL_DIR/scripts/build_hwpx.py" \
   --section /tmp/new_section0.xml \
   --output result.hwpx
 
-# 4) 검증
-python3 "$SKILL_DIR/scripts/validate.py" result.hwpx
+# 4) 기본 + 심층 검증
+python3 "$SKILL_DIR/scripts/validate.py" result.hwpx --deep
 
-# 5) 쪽수 드리프트 가드 (필수)
+# 5) 편집 전후 무결성 비교 (필수)
+python3 "$SKILL_DIR/scripts/edit_guard.py" \
+  --before reference.hwpx \
+  --after result.hwpx
+
+# 6) 쪽수 드리프트 가드 (필수)
 python3 "$SKILL_DIR/scripts/page_guard.py" \
   --reference reference.hwpx \
   --output result.hwpx
